@@ -58,5 +58,19 @@ public class TableValuedFunctionBuilder<TEntity> : TableValuedFunctionBuilder, I
     public new virtual TableValuedFunctionBuilder<TEntity> IsBuiltIn(bool builtIn = true)
         => (TableValuedFunctionBuilder<TEntity>)base.IsBuiltIn(builtIn);
 
+    /// <summary>
+    ///     Returns an object that can be used to configure a parameter with the given name.
+    ///     If no parameter with the given name exists, then a new parameter will be added.
+    /// </summary>
+    /// <remarks>
+    ///     See <see href="https://aka.ms/efcore-docs-database-functions">Database functions</see> for more information and examples.
+    /// </remarks>
+    /// <param name="name">The parameter name.</param>
+    /// <param name="buildAction">An action that performs configuration of the parameter.</param>
+    /// <returns>The builder to use for further parameter configuration.</returns>
+    /// <returns>The same builder instance so that multiple configuration calls can be chained.</returns>
+    public new virtual TableValuedFunctionBuilder<TEntity> HasParameter(string name, Action<DbFunctionParameterBuilder> buildAction)
+        => (TableValuedFunctionBuilder<TEntity>)base.HasParameter(name, buildAction);
+
     EntityTypeBuilder<TEntity> IInfrastructure<EntityTypeBuilder<TEntity>>.Instance => EntityTypeBuilder;
 }

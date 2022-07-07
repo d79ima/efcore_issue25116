@@ -53,6 +53,13 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
                         typeof(IDbFunctionParameter))
                 },
                 {
+                    typeof(IReadOnlyStoredProcedure),
+                    (typeof(IMutableStoredProcedure),
+                        typeof(IConventionStoredProcedure),
+                        typeof(IConventionStoredProcedureBuilder),
+                        typeof(IStoredProcedure))
+                },
+                {
                     typeof(IReadOnlySequence),
                     (typeof(IMutableSequence),
                         typeof(IConventionSequence),
@@ -95,12 +102,17 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
             typeof(ITableBase),
             typeof(ITable),
             typeof(IView),
+            typeof(IStoreFunction),
             typeof(ITableMappingBase),
             typeof(ITableMapping),
             typeof(IViewMapping),
+            typeof(IFunctionMapping),
             typeof(IColumnBase),
             typeof(IColumn),
             typeof(IViewColumn),
+            typeof(IFunctionColumn),
+            typeof(IStoreFunctionParameter),
+            typeof(IFunctionColumnMapping),
             typeof(IColumnMappingBase),
             typeof(IColumnMapping),
             typeof(IViewColumnMapping),
@@ -142,10 +154,20 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
             typeof(TableValuedFunctionBuilder<>),
             typeof(OwnedNavigationTableValuedFunctionBuilder),
             typeof(OwnedNavigationTableValuedFunctionBuilder<,>),
+            typeof(StoredProcedureBuilder),
+            typeof(StoredProcedureBuilder<>),
+            typeof(OwnedNavigationStoredProcedureBuilder),
+            typeof(OwnedNavigationStoredProcedureBuilder<,>),
+            typeof(NamingStoredProcedureBuilder),
+            typeof(NamingStoredProcedureBuilder<>),
+            typeof(OwnedNavigationNamingStoredProcedureBuilder),
+            typeof(OwnedNavigationNamingStoredProcedureBuilder<,>),
             typeof(ColumnBuilder),
             typeof(ColumnBuilder<>),
             typeof(ViewColumnBuilder),
             typeof(ViewColumnBuilder<>),
+            typeof(StoredProcedureParameterBuilder),
+            typeof(StoredProcedureResultColumnBuilder),
             typeof(SequenceBuilder),
             typeof(MigrationBuilder),
             typeof(AlterOperationBuilder<>),
@@ -235,7 +257,13 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
                 new[] { typeof(IReadOnlyProperty), typeof(StoreObjectIdentifier).MakeByRefType() }),
             typeof(RelationalPropertyExtensions).GetMethod(
                 nameof(RelationalPropertyExtensions.GetOverrides),
-                new[] { typeof(IReadOnlyProperty) })
+                new[] { typeof(IReadOnlyProperty) }),
+            typeof(IConventionStoredProcedureBuilder).GetMethod(
+                nameof(IConventionStoredProcedureBuilder.WithNewParameterOrder),
+                new[] { typeof(bool) }),
+            typeof(IConventionStoredProcedureBuilder).GetMethod(
+                nameof(IConventionStoredProcedureBuilder.WithNewResultColumnOrder),
+                new[] { typeof(bool) })
         };
 
         public override HashSet<MethodInfo> AsyncMethodExceptions { get; } = new()
@@ -267,6 +295,12 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
             typeof(RelationalConnectionDiagnosticsLogger).GetMethod(
                 nameof(IRelationalConnectionDiagnosticsLogger.ConnectionDisposedAsync))
         };
+        
+        public override HashSet<MethodInfo> MetadataMethodExceptions { get; } = new()
+        {
+            typeof(IMutableStoredProcedure).GetMethod(nameof(IMutableStoredProcedure.AddParameter)),
+            typeof(IMutableStoredProcedure).GetMethod(nameof(IMutableStoredProcedure.AddResultColumn))
+        };
 
         public List<IReadOnlyList<MethodInfo>> RelationalMetadataMethods { get; } = new();
 
@@ -295,6 +329,10 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
             GenericFluentApiTypes.Add(typeof(OwnedNavigationSplitViewBuilder), typeof(OwnedNavigationSplitViewBuilder<,>));
             GenericFluentApiTypes.Add(typeof(TableValuedFunctionBuilder), typeof(TableValuedFunctionBuilder<>));
             GenericFluentApiTypes.Add(typeof(OwnedNavigationTableValuedFunctionBuilder), typeof(OwnedNavigationTableValuedFunctionBuilder<,>));
+            GenericFluentApiTypes.Add(typeof(StoredProcedureBuilder), typeof(StoredProcedureBuilder<>));
+            GenericFluentApiTypes.Add(typeof(OwnedNavigationStoredProcedureBuilder), typeof(OwnedNavigationStoredProcedureBuilder<,>));
+            GenericFluentApiTypes.Add(typeof(NamingStoredProcedureBuilder), typeof(NamingStoredProcedureBuilder<>));
+            GenericFluentApiTypes.Add(typeof(OwnedNavigationNamingStoredProcedureBuilder), typeof(OwnedNavigationNamingStoredProcedureBuilder<,>));
             GenericFluentApiTypes.Add(typeof(ColumnBuilder), typeof(ColumnBuilder<>));
             GenericFluentApiTypes.Add(typeof(ViewColumnBuilder), typeof(ViewColumnBuilder<>));
 
@@ -307,7 +345,11 @@ public class RelationalApiConsistencyTest : ApiConsistencyTestBase<RelationalApi
             MirrorTypes.Add(typeof(SplitViewBuilder), typeof(OwnedNavigationSplitViewBuilder));
             MirrorTypes.Add(typeof(SplitViewBuilder<>), typeof(OwnedNavigationSplitViewBuilder<,>));
             MirrorTypes.Add(typeof(TableValuedFunctionBuilder), typeof(OwnedNavigationTableValuedFunctionBuilder));
-            MirrorTypes.Add(typeof(TableValuedFunctionBuilder<>), typeof(OwnedNavigationTableValuedFunctionBuilder<,>));            
+            MirrorTypes.Add(typeof(TableValuedFunctionBuilder<>), typeof(OwnedNavigationTableValuedFunctionBuilder<,>));
+            MirrorTypes.Add(typeof(StoredProcedureBuilder), typeof(OwnedNavigationStoredProcedureBuilder));
+            MirrorTypes.Add(typeof(StoredProcedureBuilder<>), typeof(OwnedNavigationStoredProcedureBuilder<,>));
+            MirrorTypes.Add(typeof(NamingStoredProcedureBuilder), typeof(OwnedNavigationNamingStoredProcedureBuilder));
+            MirrorTypes.Add(typeof(NamingStoredProcedureBuilder<>), typeof(OwnedNavigationNamingStoredProcedureBuilder<,>));
 
             base.Initialize();
         }

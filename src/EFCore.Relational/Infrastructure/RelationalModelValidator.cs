@@ -1376,6 +1376,7 @@ public class RelationalModelValidator : ModelValidator
                     {
                         continue;
                     }
+
                     var discriminatorValue = derivedType.GetDiscriminatorValue();
                     if (discriminatorValue is not string valueString)
                     {

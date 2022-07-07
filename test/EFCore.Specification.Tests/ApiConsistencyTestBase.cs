@@ -539,7 +539,18 @@ public abstract class ApiConsistencyTestBase<TFixture> : IClassFixture<TFixture>
 
             if (!methodLookup.TryGetValue(expectedName, out var canSetMethod))
             {
-                return $"{declaringType.Name} expected to have a {expectedName} method";
+                if (method.Name.StartsWith("Has", StringComparison.Ordinal))
+                {
+                    var otherExpectedName = "CanHave" + method.Name[3..];
+                    if (!methodLookup.TryGetValue(otherExpectedName, out canSetMethod))
+                    {
+                        return $"{declaringType.Name} expected to have a {expectedName} or {otherExpectedName} method";
+                    }
+                }
+                else
+                {
+                    return $"{declaringType.Name} expected to have a {expectedName} method";
+                }
             }
 
             var parameterIndex = method.IsStatic ? 1 : 0;
